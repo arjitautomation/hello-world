@@ -15,7 +15,7 @@ jobs:
   - task: Maven@3
     displayName: Maven MyWebApp/pom.xml
     inputs:
-      mavenPOMFile: MyWebApp/pom.xml
+      mavenPOMFile: pom.xml
   - task: CopyFiles@2
     displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
     condition: succeededOrFailed()
