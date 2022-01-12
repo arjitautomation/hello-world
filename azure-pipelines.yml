@@ -33,4 +33,8 @@ jobs:
     displayName: Run Code Analysis
   - task: SonarCloudPublish@1
     displayName: Publish Quality Gate Result
+  - task: WhiteSource@21
+    inputs:
+      cwd: '$(System.DefaultWorkingDirectory)'
+      projectName: 'arjit'
 ...
