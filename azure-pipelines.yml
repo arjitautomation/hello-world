@@ -1,0 +1,55 @@
+variables:
+- name: BuildParameters.projectKey
+  value: DevOps Project
+- name: BuildParameters.projectName
+  value: DevOps Project
+name: $(date:yyyyMMdd)$(rev:.r)
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  pool:
+    vmImage: ubuntu-18.04
+  steps:
+  - checkout: self
+    clean: true
+  - task: Maven@3
+    displayName: Maven MyWebApp/pom.xml
+    inputs:
+      mavenPOMFile: MyWebApp/pom.xml
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+    condition: succeededOrFailed()
+    enabled: False
+    inputs:
+      SourceFolder: $(system.defaultworkingdirectory)
+      Contents: '**/*.war'
+      TargetFolder: $(build.artifactstagingdirectory)
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: drop'
+    condition: succeededOrFailed()
+    enabled: False
+    inputs:
+      PathtoPublish: $(build.artifactstagingdirectory)
+  - task: SonarCloudPrepare@1
+    displayName: Prepare analysis on SonarCloud
+    inputs:
+      SonarCloud: d1013d03-3251-4984-b407-61023eddb10f
+      organization: srivasarjit
+      scannerMode: Other
+      projectKey: $(BuildParameters.projectKey)
+      projectName: $(BuildParameters.projectName)
+      extraProperties: >-
+        # Additional properties that will be passed to the scanner,
+
+        # Put one key=value per line, example:
+
+        # sonar.exclusions=**/*.bin
+
+        sonar.projectKey=srivasarjit_DevOps-Project
+
+        sonar.projectName=DevOps Project
+  - task: SonarCloudAnalyze@1
+    displayName: Run Code Analysis
+  - task: SonarCloudPublish@1
+    displayName: Publish Quality Gate Result
+...
